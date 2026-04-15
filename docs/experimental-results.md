@@ -310,7 +310,7 @@ Monolith configuration: `max_depth=5, n_restarts=20, epochs=10000`, with early s
 
 ## 12. Summary of Contributions
 
-1. **First differentiable EML tree implementation in PyTorch.** No prior work implements the EML universal operator (arXiv 2603.21852) as a trainable neural module with automatic differentiation.
+1. **Reusable EML tree library for PyTorch.** Building on the gradient-based trainer in the original paper's supplementary material (arXiv 2603.21852), Monolith packages EML trees as a pip-installable module with automatic depth selection, multi-restart, and symbolic decompilation.
 
 2. **Recovery of 7/7 elementary functions** via gradient descent with ≤24 parameters. Three functions (exp, ln, sqrt) achieve near-exact recovery (RMSE < 0.005). Five converge 20/20 seeds with low variance.
 

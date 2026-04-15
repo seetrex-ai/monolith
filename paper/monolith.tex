@@ -42,7 +42,7 @@ Independent Researcher\\
 % ══════════════════════════════════════════════════════════
 \begin{abstract}
 The EML operator $\eml(x, y) = e^x - \ln y$, recently shown to be a universal binary operator for elementary mathematics (analogous to NAND for Boolean logic), can generate all elementary functions from the grammar $S \to 1 \mid \eml(S, S)$.
-We present \monolith, the first implementation of EML trees as differentiable circuits in PyTorch, trainable via standard gradient descent.
+We present \monolith, an open-source library that packages EML trees as a reusable PyTorch \texttt{nn.Module} for symbolic regression from data.
 We demonstrate recovery of 7/7 elementary functions (exp, ln, sqrt, $x^2$, $x^3$, $1/x$, sin) with $\leq$24 parameters at depth 3, achieving RMSE $<$ 0.005 for exp, ln, and sqrt.
 We systematically characterize a depth barrier: random initialization at depth 4 always diverges due to tower-exponential growth of intermediate values.
 We test 12 initialization strategies and find that only hierarchical warm start (training depth $n-1$ first, then extending to depth $n$) enables convergence at depth 4+, yielding 12.9$\times$ improvement for $\sin(x^2)$ at depth 4 versus depth 3.
@@ -62,18 +62,18 @@ The operator $\eml(x, y) = e^x - \ln y$, combined with the constant 1, generates
 This makes EML the continuous analogue of the NAND gate in Boolean logic---a single universal primitive from which everything can be built.
 The grammar $S \to 1 \mid \eml(S, S)$ defines a family of binary trees where every node performs the same operation, and the only choice is what each leaf contributes.
 
-This universality opens a natural question: \emph{can EML trees be trained via gradient descent to discover functions from data?}
-If so, symbolic regression reduces to optimizing a homogeneous binary tree with a fixed operation at every node, where only the leaf assignments are learned.
+Odrzywołek's own supplementary material~\citep{odrzywołek2026eml} includes a PyTorch trainer that demonstrates gradient-based recovery of EML trees at depths 2--6.
+Building on this foundation, we ask: \emph{can EML tree training be packaged as a reusable symbolic regression tool, and what are its practical limits compared to established methods?}
 
-We present \monolith, a PyTorch module that answers this question affirmatively, with caveats.
+We present \monolith, an open-source PyTorch library that wraps EML tree training into a single \texttt{fit()} call with hierarchical multi-depth search.
 Our contributions:
 
 \begin{enumerate}
-    \item We implement the first differentiable EML tree as a PyTorch \texttt{nn.Module}, with softmax-parameterized leaves and vectorized bottom-up evaluation (\S\ref{sec:method}).
+    \item We package EML trees as a reusable \texttt{nn.Module} with automatic depth selection, multi-restart, and symbolic decompilation (\S\ref{sec:method}).
     \item We recover 7/7 elementary functions via gradient descent with $\leq$24 parameters (\S\ref{sec:elementary}).
     \item We systematically characterize the depth barrier: 12 initialization strategies tested, only 3 enable depth 4+ convergence. Hierarchical training yields 12.9$\times$ improvement for composite functions (\S\ref{sec:depth}).
     \item We report two negative results: extended leaf constants degrade performance, and trained trees use continuous mixtures rather than discrete assignments (\S\ref{sec:negative}).
-    \item We provide honest baselines (49-parameter MLP and PySR), showing that \monolith{} is not competitive as a function approximator but demonstrates a distinct structural principle (\S\ref{sec:comparison}).
+    \item We compare against a 49-parameter MLP and PySR, documenting the performance gap and why it is structurally expected (\S\ref{sec:comparison}).
 \end{enumerate}
 
 % ══════════════════════════════════════════════════════════
@@ -96,7 +96,8 @@ PySR~\citep{cranmer2023pysr} uses multi-population evolutionary search over expr
 PSRN~\citep{ruan2026psrn} parallelizes exhaustive enumeration on GPUs.
 AI Feynman~\citep{udrescu2020aifeynman} combines neural networks with recursive decomposition.
 All use rich operator sets ($+, -, \times, /, \exp, \log, \sin, \cos, \sqrt{\cdot}$).
-No prior work trains EML trees via gradient descent.
+Odrzywołek~\citep{odrzywołek2026eml} provides a PyTorch trainer for EML trees in supplementary material, demonstrating depth 2--6 training with multiple initialization strategies.
+No prior work packages EML trees as a reusable symbolic regression library with automatic depth selection and baseline comparisons.
 
 % ══════════════════════════════════════════════════════════
 \section{Method}
@@ -398,10 +399,9 @@ Two modifications could substantially change these results:
 % ══════════════════════════════════════════════════════════
 \section{Conclusion}
 
-We presented \monolith{}, the first differentiable implementation of EML trees for symbolic regression.
-The approach recovers 7/7 elementary functions with minimal parameters, solves the depth-4 barrier via hierarchical training, and provides honest characterization of its limitations: continuous leaf mixing, limited depth scaling, and non-competitiveness with MLPs or tools that have explicit operator libraries.
-\monolith{}'s value is not as a function approximator---MLPs and PySR both outperform it---but as a demonstration that gradient descent can navigate the minimal grammar $S \to 1 \mid \eml(S, S)$ without any domain-specific operator engineering.
-The work identifies the concrete challenges (discrete selection, depth scaling) that must be solved for the approach to become practical.
+We presented \monolith{}, an open-source library that packages EML tree training as a reusable PyTorch module for symbolic regression, building on the gradient-based training demonstrated by Odrzywołek~\citep{odrzywołek2026eml}.
+The library recovers 7/7 elementary functions with minimal parameters, provides hierarchical multi-depth search with automatic depth selection, and includes honest characterization of its limitations: continuous leaf mixing, limited depth scaling, and non-competitiveness with MLPs or tools that have explicit operator libraries.
+\monolith{}'s value is as an accessible tool for exploring EML-based symbolic regression, with baseline comparisons and negative results that inform future work on the approach.
 
 Code and data: \url{https://github.com/seetrex-ai/monolith}.
 All experiments are reproducible via the provided code with fixed random seeds; the benchmark script (\texttt{benchmarks/vs\_pysr.py}) runs both methods on identical data.

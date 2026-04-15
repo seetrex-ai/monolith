@@ -8,7 +8,7 @@
 
 The EML operator `eml(x, y) = exp(x) - ln(y)` is a universal binary operator for continuous mathematics ([arXiv 2603.21852](https://arxiv.org/abs/2603.21852)) — the continuous analogue of the NAND gate. Combined with the constant 1, it generates all elementary functions from a single grammar: `S → 1 | eml(S, S)`.
 
-Monolith implements EML trees as trainable PyTorch modules, demonstrating that gradient descent can navigate this minimal grammar to recover mathematical functions from data.
+Monolith packages EML trees as a reusable PyTorch module for symbolic regression, building on the gradient-based training demonstrated by [Odrzywołek (2026)](https://arxiv.org/abs/2603.21852). It provides a single `fit()` call with hierarchical multi-depth search, symbolic decompilation, and baseline comparisons.
 
 > **Paper:** [Monolith: Differentiable EML Trees for Symbolic Regression via Gradient Descent on a Universal Operator](https://zenodo.org/records/19592926) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19592926.svg)](https://doi.org/10.5281/zenodo.19592926)
 
@@ -22,7 +22,7 @@ Every symbolic regression method (PySR, AI Feynman, PSRN) relies on human-curate
 | MLP (49 params) | tanh, linear | 3×10⁻⁶ | opaque |
 | **Monolith** (6 params) | **eml only** | 1.3×10⁻⁵ | `exp(x)` |
 
-Monolith is not a competing tool — it is a proof-of-concept for gradient-based optimization on a universal operator basis.
+Monolith is not a competing tool — it packages EML tree training into a reusable library with honest baselines.
 
 ## Installation
 
