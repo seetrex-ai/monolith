@@ -1,0 +1,47 @@
+% EML tree figure — depth 2 example
+% Include in main paper with \input{fig_tree.tex}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+    eml/.style={circle, draw=blue!60, fill=blue!10, thick, minimum size=10mm, font=\small\bfseries},
+    leaf/.style={rectangle, draw=orange!60, fill=orange!10, thick, minimum size=10mm, font=\small, rounded corners=2pt},
+    edge from parent/.style={draw, thick, -},
+    level 1/.style={sibling distance=4.5cm, level distance=1.8cm},
+    level 2/.style={sibling distance=2.2cm, level distance=1.8cm},
+]
+
+% Root
+\node[eml] (root) {\eml}
+    child {
+        node[eml] (n1) {\eml}
+        child {
+            node[leaf] (l0) {$\ell_0$}
+        }
+        child {
+            node[leaf] (l1) {$\ell_1$}
+        }
+    }
+    child {
+        node[eml] (n2) {\eml}
+        child {
+            node[leaf] (l2) {$\ell_2$}
+        }
+        child {
+            node[leaf] (l3) {$\ell_3$}
+        }
+    };
+
+% Labels below leaves
+\node[below=0.15cm of l0, font=\scriptsize, text=gray!70!black] {$\sigma(\boldsymbol{w}_0)^\top \mathbf{c}$};
+\node[below=0.15cm of l1, font=\scriptsize, text=gray!70!black] {$\sigma(\boldsymbol{w}_1)^\top \mathbf{c}$};
+\node[below=0.15cm of l2, font=\scriptsize, text=gray!70!black] {$\sigma(\boldsymbol{w}_2)^\top \mathbf{c}$};
+\node[below=0.15cm of l3, font=\scriptsize, text=gray!70!black] {$\sigma(\boldsymbol{w}_3)^\top \mathbf{c}$};
+
+% Candidate vector annotation
+\node[below=0.9cm of l1, font=\scriptsize, text=gray!50!black, anchor=north] {$\mathbf{c} = (0,\; 1,\; x)$};
+
+\end{tikzpicture}
+\caption{EMLTree architecture (depth 2, 1 variable). Blue nodes: $\eml(L, R) = e^L - \ln R$. Orange leaves: softmax-weighted mixture $\sigma(\boldsymbol{w}_i)^\top \mathbf{c}$ over candidates $\mathbf{c} = (0, 1, x)$. This tree has $4 \times 3 = 12$ trainable parameters.}
+\label{fig:tree}
+\end{figure}
