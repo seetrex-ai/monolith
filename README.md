@@ -52,6 +52,17 @@ y_pred = tree(x)
 print(tree.to_symbolic())  # exp(x)
 ```
 
+### With tau annealing
+
+Tau annealing ([Odrzywołek, 2026](https://arxiv.org/abs/2603.21852)) forces leaves toward discrete assignments during training, enabling cleaner symbolic recovery:
+
+```python
+tree = EMLTree.fit(x, y, max_depth=3, n_restarts=10, epochs=10000,
+                   tau_search=2.5, tau_hard=0.01, verbose=True)
+
+print(tree.snap_symbolic(x, y))  # clean formula if snap succeeds
+```
+
 ## Results
 
 ### Elementary function recovery
@@ -93,7 +104,7 @@ Both baselines outperform Monolith. This is expected: PySR has the target functi
 
 ## API
 
-### `EMLTree.fit(x, y, max_depth=3, n_restarts=10, epochs=10000)`
+### `EMLTree.fit(x, y, max_depth=3, n_restarts=10, epochs=10000, **kwargs)`
 
 Train an EMLTree via hierarchical multi-depth search with restarts. Returns the best tree found.
 
@@ -102,10 +113,14 @@ Train an EMLTree via hierarchical multi-depth search with restarts. Returns the 
 - **max_depth** — maximum tree depth to try (default 3)
 - **n_restarts** — random seeds per depth (default 10)
 - **epochs** — training epochs per run (default 10000)
+- **tau_search** — softmax temperature during search phase (default 1.0; set >1.0 to enable tau annealing)
+- **tau_hard** — temperature target at end of hardening (default 0.01)
+- **hardening_fraction** — fraction of epochs for hardening phase (default 0.25)
+- **lam_entropy** — entropy penalty weight during hardening (default 0.02)
 
-### `tree(x)` — Forward pass
+### `tree(x, tau=1.0)` — Forward pass
 
-Evaluate the tree. Input `(batch, n_vars)` → output `(batch,)`.
+Evaluate the tree. Input `(batch, n_vars)` → output `(batch,)`. Optional `tau` controls softmax temperature.
 
 ### `tree.to_symbolic()` — Faithful decompilation
 
@@ -115,15 +130,15 @@ Returns a SymPy expression. Leaves with >95% confidence snap to discrete candida
 
 Forces argmax on all leaves. Returns a clean SymPy expression if the snapped version fits within tolerance, otherwise `None`.
 
-### `tree.leaf_entropy()` — Diagnostic
+### `tree.leaf_entropy(tau=1.0)` — Diagnostic
 
 Per-leaf Shannon entropy. Low values = leaf has decided; high = undecided.
 
 ## Tests
 
 ```bash
-pytest tests/ -v                # all tests (32 total, ~26 min)
-pytest tests/ -v -m "not slow"  # fast only (24 tests, ~3s)
+pytest tests/ -v                # all tests (41 total, ~16 min)
+pytest tests/ -v -m "not slow"  # fast only (28 tests, ~5s)
 ```
 
 ## Development
@@ -139,7 +154,7 @@ pytest
 
 Contributions welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). Priority areas:
 
-- [ ] **Gumbel-Softmax leaf selection** — temperature annealing for discrete leaf assignments, enabling clean symbolic recovery at depth ≥ 2
+- [x] **Tau annealing** — temperature annealing for discrete leaf assignments, inspired by [Odrzywołek (2026)](https://arxiv.org/abs/2603.21852)
 - [ ] **Multi-variable support** — validate f(x, y) and evaluate on Feynman benchmark equations
 - [ ] **GPU acceleration** — parallelize multi-restart loop for faster training
 - [ ] **Depth 5+ scaling** — extend hierarchical training beyond depth 4
