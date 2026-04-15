@@ -135,6 +135,17 @@ pip install -e ".[dev]"
 pytest
 ```
 
+## Roadmap
+
+Contributions welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). Priority areas:
+
+- [ ] **Gumbel-Softmax leaf selection** — temperature annealing for discrete leaf assignments, enabling clean symbolic recovery at depth ≥ 2
+- [ ] **Multi-variable support** — validate f(x, y) and evaluate on Feynman benchmark equations
+- [ ] **GPU acceleration** — parallelize multi-restart loop for faster training
+- [ ] **Depth 5+ scaling** — extend hierarchical training beyond depth 4
+
+Open a [Discussion](https://github.com/seetrex-ai/monolith/discussions) for questions or ideas.
+
 ## Citation
 
 ```bibtex
